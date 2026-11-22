@@ -114,19 +114,16 @@
         }
 
         .success {
-            display: block;
             background: #e7f8ed;
             color: #187a38;
         }
 
         .error {
-            display: block;
             background: #ffe9e9;
             color: #c62828;
         }
 
         .loading {
-            display: block;
             background: #fff5d9;
             color: #806000;
         }
@@ -328,7 +325,6 @@
 
         </div>
 
-
         <section id="results" style="display:none;">
 
             <div class="card">
@@ -356,7 +352,6 @@
 
             </div>
 
-
             <div class="card">
 
                 <h2>Skills Detected</h2>
@@ -365,7 +360,6 @@
 
             </div>
 
-
             <div class="card">
 
                 <h2>Recommended Jobs</h2>
@@ -373,7 +367,6 @@
                 <div id="jobsList"></div>
 
             </div>
-
 
             <div class="card">
 
@@ -389,17 +382,14 @@
 
     </main>
 
-
     <footer class="footer">
         JobAI - AI Powered Job Recommendation System
     </footer>
 
-
     <script>
 
-        // LOCAL BACKEND URL
-        const API_URL = "http://127.0.0.1:8000";
-
+        // LIVE BACKEND URL
+        const API_URL = "https://ai-job-recommender-backend.onrender.com";
 
         // HTML ELEMENTS
         const resumeFile = document.getElementById("resumeFile");
@@ -422,23 +412,17 @@
         const learnList =
             document.getElementById("learnList");
 
-
         // FILE SELECT
         resumeFile.addEventListener("change", function () {
 
             if (resumeFile.files.length > 0) {
-
                 selectedFile.textContent =
                     "Selected: " + resumeFile.files[0].name;
-
             } else {
-
                 selectedFile.textContent = "";
-
             }
 
         });
-
 
         // ANALYZE RESUME
         analyzeBtn.addEventListener("click", async function () {
@@ -447,14 +431,11 @@
             results.style.display = "none";
 
             if (!resumeFile.files.length) {
-
                 showMessage(
                     "Please select your resume first.",
                     "error"
                 );
-
                 return;
-
             }
 
             const file = resumeFile.files[0];
@@ -493,23 +474,19 @@
                 }
 
                 if (!response.ok) {
-
                     throw new Error(
                         data.detail ||
                         data.error ||
                         `Server error: ${response.status}`
                     );
-
                 }
 
                 if (!data.success) {
-
                     throw new Error(
                         data.error ||
                         data.message ||
                         "Resume analysis failed."
                     );
-
                 }
 
                 displayResults(data);
@@ -543,7 +520,6 @@
 
         });
 
-
         // DISPLAY RESULTS
         function displayResults(data) {
 
@@ -557,7 +533,6 @@
             jobCount.textContent =
                 data.total_jobs_checked ??
                 (data.recommendations || []).length;
-
 
             // DETECTED SKILLS
             skillsContainer.innerHTML = "";
@@ -573,16 +548,13 @@
 
             });
 
-
             // JOB RECOMMENDATIONS
             jobsList.innerHTML = "";
 
             const jobs = data.recommendations || [];
 
             if (!jobs.length) {
-
                 jobsList.textContent = "No jobs found.";
-
             }
 
             jobs.forEach(function (job) {
@@ -630,7 +602,6 @@
                     `;
 
                 });
-
 
                 card.innerHTML = `
                     <div class="job-header">
@@ -698,7 +669,6 @@
 
             });
 
-
             // ALL MISSING SKILLS
             missingSkillsContainer.innerHTML = "";
 
@@ -724,7 +694,6 @@
                 missingSkillsContainer.appendChild(span);
 
             });
-
 
             // LEARNING SUGGESTIONS
             learnList.innerHTML = "";
@@ -777,12 +746,10 @@
 
         }
 
-
         // FORMAT SKILL NAMES
         function formatSkillName(skill) {
 
             const names = {
-
                 "python": "Python",
                 "c++": "C++",
                 "java": "Java",
@@ -790,44 +757,33 @@
                 "html": "HTML",
                 "css": "CSS",
                 "react": "React",
-
                 "sql": "SQL",
                 "mysql": "MySQL",
-
                 "git": "Git",
                 "github": "GitHub",
-
                 "dsa": "DSA",
                 "algorithms": "Algorithms",
                 "data structures": "Data Structures",
-
                 "oops": "OOPS",
                 "oop": "OOP",
                 "dbms": "DBMS",
-
                 "operating systems": "Operating Systems",
                 "computer networks": "Computer Networks",
-
                 "pandas": "Pandas",
                 "numpy": "NumPy",
                 "matplotlib": "Matplotlib",
-
                 "machine learning": "Machine Learning",
                 "scikit-learn": "Scikit-Learn",
                 "deep learning": "Deep Learning",
-
                 "artificial intelligence": "Artificial Intelligence",
                 "data science": "Data Science",
-
                 "excel": "Excel",
                 "power bi": "Power BI",
                 "tableau": "Tableau",
-
                 "fastapi": "FastAPI",
                 "aws": "AWS",
                 "azure": "Azure",
                 "docker": "Docker"
-
             };
 
             const key = String(skill).toLowerCase().trim();
@@ -835,7 +791,6 @@
             return names[key] || skill;
 
         }
-
 
         // HTML SECURITY HELPER
         function escapeHTML(value) {
@@ -849,7 +804,6 @@
 
         }
 
-
         // SHOW MESSAGE
         function showMessage(text, type) {
 
@@ -858,7 +812,6 @@
             message.style.display = "block";
 
         }
-
 
         // HIDE MESSAGE
         function hideMessage() {
