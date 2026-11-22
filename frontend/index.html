@@ -1,19 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JobAI - AI Job Recommender</title>
 
     <style>
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -24,128 +17,116 @@
         body {
             background: #f4f7fb;
             color: #172b4d;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .hero {
-            background: linear-gradient(
-                135deg,
-                #173b7a,
-                #2864e8
-            );
-
+            background: linear-gradient(135deg, #173b7a, #2864e8);
             color: white;
-            padding: 40px 7% 100px;
+            padding: 45px 7% 100px;
         }
 
         .logo {
             font-size: 30px;
             font-weight: 800;
-            margin-bottom: 55px;
-            letter-spacing: -1px;
+            margin-bottom: 40px;
         }
 
         .hero h1 {
-            font-size: 48px;
-            line-height: 1.15;
-            margin-bottom: 20px;
+            font-size: 42px;
+            margin-bottom: 15px;
         }
 
         .hero p {
-            font-size: 20px;
-            line-height: 1.7;
-            max-width: 850px;
-            opacity: 0.95;
+            font-size: 18px;
+            max-width: 800px;
         }
 
         .container {
             width: 94%;
-            max-width: 1250px;
+            max-width: 1200px;
             margin: -55px auto 60px;
         }
 
         .card {
             background: white;
-            border-radius: 20px;
-            padding: 35px;
+            border-radius: 18px;
+            padding: 30px;
             margin-bottom: 25px;
-            box-shadow:
-                0 10px 35px rgba(0, 0, 0, 0.07);
+            box-shadow: 0 10px 35px rgba(0,0,0,.07);
         }
 
         .card h2 {
-            font-size: 28px;
-            margin-bottom: 25px;
+            margin-bottom: 22px;
+            font-size: 26px;
         }
 
         .upload-box {
             border: 2px dashed #76a8ff;
             background: #f0f6ff;
-            border-radius: 18px;
-            padding: 45px 25px;
+            border-radius: 16px;
+            padding: 35px 20px;
             text-align: center;
         }
 
         .upload-icon {
             font-size: 45px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .upload-box p {
-            font-size: 19px;
+            margin-bottom: 20px;
             color: #44546a;
-            margin-bottom: 22px;
         }
 
-        input[type="file"] {
+        input[type=file] {
             display: block;
-            margin: 0 auto 25px;
+            margin: 0 auto 20px;
             max-width: 100%;
-            font-size: 15px;
         }
 
         button {
             background: #2864e8;
             color: white;
             border: none;
-            padding: 14px 30px;
-            border-radius: 10px;
-            font-size: 17px;
-            font-weight: 700;
+            padding: 13px 25px;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
         }
 
         button:hover {
             background: #174fc7;
-            transform: translateY(-1px);
         }
 
         button:disabled {
             background: #9aa4b2;
             cursor: not-allowed;
-            transform: none;
         }
 
         .message {
-            margin-top: 20px;
-            padding: 15px 18px;
-            border-radius: 10px;
-            font-size: 16px;
             display: none;
+            margin-top: 18px;
+            padding: 14px;
+            border-radius: 10px;
+            overflow-wrap: anywhere;
         }
 
         .success {
+            display: block;
             background: #e7f8ed;
             color: #187a38;
         }
 
         .error {
+            display: block;
             background: #ffe9e9;
             color: #c62828;
         }
 
         .loading {
+            display: block;
             background: #fff5d9;
             color: #806000;
         }
@@ -153,127 +134,85 @@
         .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            gap: 18px;
         }
 
         .stat {
             background: #f6f8fc;
             border: 1px solid #e6eaf0;
-            border-radius: 16px;
-            padding: 25px;
+            border-radius: 14px;
+            padding: 22px;
             text-align: center;
         }
 
         .stat h3 {
-            font-size: 38px;
+            font-size: 35px;
             color: #2864e8;
-            margin-bottom: 6px;
         }
 
         .stat p {
             color: #657184;
-            font-size: 16px;
-            font-weight: 600;
+            font-weight: bold;
         }
 
-        .skills,
-        .missing {
+        .skills {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
 
         .skill {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
             background: #eaf1ff;
             color: #2057c7;
-            border: 1px solid #d5e3ff;
-            padding: 8px 14px;
-            border-radius: 30px;
+            padding: 8px 13px;
+            border-radius: 25px;
             font-size: 14px;
-            font-weight: 700;
-            white-space: nowrap;
+            font-weight: bold;
         }
 
-        .missing-skill {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: #fff0f0;
-            color: #c62828;
-            border: 1px solid #ffd2d2;
-            padding: 8px 14px;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .job {
+        .job-card {
             border: 1px solid #e1e6ed;
-            border-radius: 17px;
-            padding: 25px;
+            border-radius: 15px;
+            padding: 23px;
             margin-bottom: 18px;
-            background: #ffffff;
-            transition: 0.2s;
-        }
-
-        .job:hover {
-            box-shadow:
-                0 8px 25px rgba(0, 0, 0, 0.07);
-            transform: translateY(-2px);
         }
 
         .job-header {
             display: flex;
             justify-content: space-between;
             gap: 15px;
-            align-items: flex-start;
-            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
-        .job h3 {
-            font-size: 23px;
-            margin-bottom: 5px;
-            color: #172b4d;
+        .job-title {
+            font-size: 22px;
         }
 
         .company {
             color: #2864e8;
-            font-weight: 700;
-            font-size: 16px;
+            font-weight: bold;
         }
 
-        .match {
-            display: inline-block;
+        .match-badge {
             background: #e7f8ed;
             color: #188038;
-            padding: 7px 13px;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 800;
-            white-space: nowrap;
+            padding: 7px 12px;
+            border-radius: 25px;
+            font-weight: bold;
+            height: fit-content;
         }
 
         .job-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
             color: #596579;
-            font-size: 15px;
+            margin: 12px 0;
         }
 
         .job-section {
-            margin-top: 14px;
+            margin-top: 18px;
         }
 
-        .job-section strong {
-            display: block;
-            margin-bottom: 8px;
-            color: #27364d;
+        .job-section h4 {
+            margin-bottom: 10px;
         }
 
         .job-skills {
@@ -282,155 +221,94 @@
             gap: 8px;
         }
 
-        .mini-skill {
-            background: #f2f5f9;
-            color: #48566b;
-            border: 1px solid #e0e5eb;
-            padding: 6px 11px;
+        .job-skill {
+            padding: 6px 10px;
             border-radius: 20px;
             font-size: 13px;
-            white-space: nowrap;
         }
 
-        .mini-matched {
-            background: #eaf8ee;
+        .matched {
+            background: #e7f8ed;
             color: #187a38;
-            border-color: #ccebd5;
         }
 
-        .apply {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        .missing {
+            background: #fff0f0;
+            color: #c62828;
+        }
+
+        .learn-box {
             margin-top: 18px;
-            padding: 11px 20px;
-            background: #2864e8;
-            color: white;
-            text-decoration: none;
-            border-radius: 9px;
-            font-size: 14px;
-            font-weight: 700;
-            transition: 0.2s;
-        }
-
-        .apply:hover {
-            background: #174fc7;
-            transform: translateY(-1px);
-        }
-
-        .learning-item {
+            padding: 15px;
             background: #f7f9fc;
-            border: 1px solid #e5e9ef;
             border-radius: 12px;
-            padding: 15px 17px;
+        }
+
+        .learn-box h4 {
             margin-bottom: 10px;
         }
 
-        .learning-item strong {
-            color: #2864e8;
+        .learn-box p {
+            margin-bottom: 8px;
         }
 
-        .learning-item span {
-            color: #5f6b7a;
-        }
-
-        .empty {
-            color: #697586;
-            font-size: 16px;
+        .apply-btn {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 11px 18px;
+            background: #2864e8;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
         }
 
         .footer {
             text-align: center;
             padding: 30px;
             color: #77808f;
-            font-size: 14px;
         }
 
-        @media (max-width: 750px) {
-
-            .hero {
-                padding: 30px 6% 85px;
-            }
-
+        @media(max-width: 700px) {
             .hero h1 {
-                font-size: 35px;
-            }
-
-            .hero p {
-                font-size: 17px;
-            }
-
-            .container {
-                width: 92%;
-            }
-
-            .card {
-                padding: 23px;
+                font-size: 32px;
             }
 
             .stats {
                 grid-template-columns: 1fr;
             }
 
-            .job-header {
-                flex-direction: column;
-            }
-
-            .match {
-                align-self: flex-start;
-            }
-
-            .upload-box {
-                padding: 30px 15px;
+            .card {
+                padding: 22px;
             }
         }
-
     </style>
-
 </head>
-
 
 <body>
 
-
     <section class="hero">
+        <div class="logo">JobAI</div>
 
-        <div class="logo">
-            JobAI
-        </div>
-
-        <h1>
-            AI-Powered Career Matching
-        </h1>
+        <h1>AI-Powered Career Matching</h1>
 
         <p>
-            Upload your resume and discover jobs
-            that match your skills, identify missing
-            skills, and find out what you should
-            learn next.
+            Upload your resume and discover jobs that match your skills,
+            identify missing skills, and find out what you should learn next.
         </p>
-
     </section>
-
 
     <main class="container">
 
-
         <div class="card">
 
-            <h2>
-                Upload Your Resume
-            </h2>
+            <h2>Upload Your Resume</h2>
 
             <div class="upload-box">
 
-                <div class="upload-icon">
-                    📄
-                </div>
+                <div class="upload-icon">📄</div>
 
-                <p>
-                    Upload your PDF or DOCX resume
-                </p>
+                <p>Upload your PDF or DOCX resume</p>
 
                 <input
                     type="file"
@@ -438,74 +316,40 @@
                     accept=".pdf,.docx"
                 >
 
-                <button
-                    id="analyzeBtn"
-                    onclick="analyzeResume()"
-                >
+                <p id="selectedFile"></p>
+
+                <button id="analyzeBtn" type="button">
                     Analyze Resume
                 </button>
 
             </div>
 
-            <div
-                id="message"
-                class="message"
-            >
-            </div>
+            <div id="message" class="message"></div>
 
         </div>
 
 
-        <section
-            id="results"
-            style="display: none;"
-        >
-
+        <section id="results" style="display:none;">
 
             <div class="card">
 
-                <h2>
-                    Your Career Analysis
-                </h2>
+                <h2>Your Career Analysis</h2>
 
                 <div class="stats">
 
                     <div class="stat">
-
-                        <h3 id="resumeScore">
-                            -
-                        </h3>
-
-                        <p>
-                            Resume Score
-                        </p>
-
+                        <h3 id="resumeScore">-</h3>
+                        <p>Resume Score</p>
                     </div>
-
 
                     <div class="stat">
-
-                        <h3 id="skillCount">
-                            -
-                        </h3>
-
-                        <p>
-                            Skills Detected
-                        </p>
-
+                        <h3 id="skillCount">-</h3>
+                        <p>Skills Detected</p>
                     </div>
-
 
                     <div class="stat">
-
-                        <h3 id="jobCount">
-                            -
-                        </h3>
-
-                        <p>
-                            Jobs Analyzed
-                        </p>
-
+                        <h3 id="jobCount">-</h3>
+                        <p>Jobs Analyzed</p>
                     </div>
 
                 </div>
@@ -515,51 +359,31 @@
 
             <div class="card">
 
-                <h2>
-                    Skills Detected
-                </h2>
+                <h2>Skills Detected</h2>
 
-                <div
-                    id="skills"
-                    class="skills"
-                >
-                </div>
+                <div id="skillsContainer" class="skills"></div>
 
             </div>
 
 
             <div class="card">
 
-                <h2>
-                    Recommended Jobs
-                </h2>
+                <h2>Recommended Jobs</h2>
 
-                <div id="jobs">
-                </div>
+                <div id="jobsList"></div>
 
             </div>
 
 
             <div class="card">
 
-                <h2>
-                    Skills You Should Learn
-                </h2>
+                <h2>Skills You Should Learn</h2>
 
-                <div
-                    id="missingSkills"
-                    class="missing"
-                >
-                </div>
+                <div id="missingSkills" class="skills"></div>
 
-                <div
-                    id="learnList"
-                    style="margin-top:18px;"
-                >
-                </div>
+                <div id="learnList" style="margin-top:18px;"></div>
 
             </div>
-
 
         </section>
 
@@ -571,963 +395,481 @@
     </footer>
 
 
+    <script>
 
-<script>
-
-
-    /* ============================
-       LIVE BACKEND URL
-    ============================ */
-
-    const API_URL =
-        "https://ai-job-recommender-live-production.up.railway.app";
+        // LOCAL BACKEND URL
+        const API_URL = "http://127.0.0.1:8000";
 
 
-    /* ============================
-       COMPANY CAREER LINKS
-    ============================ */
+        // HTML ELEMENTS
+        const resumeFile = document.getElementById("resumeFile");
+        const selectedFile = document.getElementById("selectedFile");
+        const analyzeBtn = document.getElementById("analyzeBtn");
 
-    const companyApplyUrls = {
+        const message = document.getElementById("message");
+        const results = document.getElementById("results");
 
-        "Amazon":
-            "https://www.amazon.jobs/en/",
+        const resumeScore = document.getElementById("resumeScore");
+        const skillCount = document.getElementById("skillCount");
+        const jobCount = document.getElementById("jobCount");
 
-        "Google":
-            "https://careers.google.com/",
+        const skillsContainer = document.getElementById("skillsContainer");
+        const jobsList = document.getElementById("jobsList");
 
-        "Microsoft":
-            "https://jobs.careers.microsoft.com/",
+        const missingSkillsContainer =
+            document.getElementById("missingSkills");
 
-        "Accenture":
-            "https://www.accenture.com/in-en/careers",
-
-        "IBM":
-            "https://www.ibm.com/careers/search",
-
-        "Infosys":
-            "https://www.infosys.com/careers/apply.html",
-
-        "TCS":
-            "https://www.tcs.com/careers/india",
-
-        "Wipro":
-            "https://careers.wipro.com/",
-
-        "Cognizant":
-            "https://careers.cognizant.com/",
-
-        "Deloitte":
-            "https://www.deloitte.com/in/en/careers.html"
-
-    };
+        const learnList =
+            document.getElementById("learnList");
 
 
-    /* ============================
-       ANALYZE RESUME
-    ============================ */
+        // FILE SELECT
+        resumeFile.addEventListener("change", function () {
 
-    async function analyzeResume() {
+            if (resumeFile.files.length > 0) {
 
-        const fileInput =
-            document.getElementById("resumeFile");
+                selectedFile.textContent =
+                    "Selected: " + resumeFile.files[0].name;
 
-        const button =
-            document.getElementById("analyzeBtn");
+            } else {
 
-        const results =
-            document.getElementById("results");
+                selectedFile.textContent = "";
 
-        const file =
-            fileInput.files[0];
+            }
+
+        });
 
 
-        if (!file) {
+        // ANALYZE RESUME
+        analyzeBtn.addEventListener("click", async function () {
+
+            hideMessage();
+            results.style.display = "none";
+
+            if (!resumeFile.files.length) {
+
+                showMessage(
+                    "Please select your resume first.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+            const file = resumeFile.files[0];
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = "Analyzing...";
 
             showMessage(
-                "Please select your resume first.",
-                "error"
+                "Analyzing your resume. Please wait...",
+                "loading"
             );
 
-            return;
-        }
+            try {
 
-
-        const fileName =
-            file.name.toLowerCase();
-
-
-        if (
-            !fileName.endsWith(".pdf") &&
-            !fileName.endsWith(".docx")
-        ) {
-
-            showMessage(
-                "Please upload a PDF or DOCX file.",
-                "error"
-            );
-
-            return;
-        }
-
-
-        button.disabled = true;
-
-        button.innerText =
-            "Analyzing...";
-
-
-        showMessage(
-            "Analyzing your resume. Please wait...",
-            "loading"
-        );
-
-
-        results.style.display =
-            "none";
-
-
-        try {
-
-            const formData =
-                new FormData();
-
-            formData.append(
-                "file",
-                file
-            );
-
-
-            const response =
-                await fetch(
-                    API_URL + "/match-jobs",
+                const response = await fetch(
+                    `${API_URL}/match-jobs`,
                     {
                         method: "POST",
                         body: formData
                     }
                 );
 
+                const responseText = await response.text();
 
-            if (!response.ok) {
+                let data;
 
-                throw new Error(
-                    "Backend error: " +
-                    response.status
+                try {
+                    data = JSON.parse(responseText);
+                } catch {
+                    throw new Error(
+                        "Backend returned an invalid response."
+                    );
+                }
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.detail ||
+                        data.error ||
+                        `Server error: ${response.status}`
+                    );
+
+                }
+
+                if (!data.success) {
+
+                    throw new Error(
+                        data.error ||
+                        data.message ||
+                        "Resume analysis failed."
+                    );
+
+                }
+
+                displayResults(data);
+
+                showMessage(
+                    "Resume analyzed successfully!",
+                    "success"
                 );
 
-            }
-
-
-            const data =
-                await response.json();
-
-
-            console.log(
-                "JobAI API Response:",
-                data
-            );
-
-
-            if (!data.success) {
-
-                throw new Error(
-                    data.message ||
-                    "Resume analysis failed."
-                );
-
-            }
-
-
-            displayResults(data);
-
-
-            showMessage(
-                "Resume analyzed successfully!",
-                "success"
-            );
-
-
-            results.style.display =
-                "block";
-
-
-            setTimeout(() => {
+                results.style.display = "block";
 
                 results.scrollIntoView({
                     behavior: "smooth"
                 });
 
-            }, 300);
+            } catch (error) {
 
+                console.error("JobAI Error:", error);
 
-        }
-
-        catch (error) {
-
-            console.error(
-                "JobAI Error:",
-                error
-            );
-
-
-            showMessage(
-                "Backend connection failed. Please try again.",
-                "error"
-            );
-
-        }
-
-
-        finally {
-
-            button.disabled = false;
-
-            button.innerText =
-                "Analyze Resume";
-
-        }
-
-    }
-
-
-
-    /* ============================
-       DISPLAY RESULTS
-    ============================ */
-
-    function displayResults(data) {
-
-
-        const score =
-            data.resume_score ?? 0;
-
-
-        document.getElementById(
-            "resumeScore"
-        ).innerText =
-            score + "/100";
-
-
-        const skills =
-            data.detected_skills || [];
-
-
-        document.getElementById(
-            "skillCount"
-        ).innerText =
-            skills.length;
-
-
-        const skillsContainer =
-            document.getElementById(
-                "skills"
-            );
-
-
-        skillsContainer.innerHTML =
-            "";
-
-
-        skills.forEach(skill => {
-
-            const badge =
-                document.createElement(
-                    "span"
+                showMessage(
+                    "Error: " + error.message,
+                    "error"
                 );
 
+            } finally {
 
-            badge.className =
-                "skill";
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = "Analyze Resume";
 
-
-            badge.innerText =
-                formatText(skill);
-
-
-            skillsContainer.appendChild(
-                badge
-            );
+            }
 
         });
 
 
-        const jobs =
-            data.recommendations ||
-            data.recommended_jobs ||
-            data.jobs ||
-            [];
+        // DISPLAY RESULTS
+        function displayResults(data) {
+
+            resumeScore.textContent =
+                (data.resume_score ?? 0) + "/100";
+
+            const skills = data.detected_skills || [];
+
+            skillCount.textContent = skills.length;
+
+            jobCount.textContent =
+                data.total_jobs_checked ??
+                (data.recommendations || []).length;
 
 
-        document.getElementById(
-            "jobCount"
-        ).innerText =
-            data.total_jobs_checked ??
-            jobs.length;
+            // DETECTED SKILLS
+            skillsContainer.innerHTML = "";
+
+            skills.forEach(function (skill) {
+
+                const span = document.createElement("span");
+
+                span.className = "skill";
+                span.textContent = formatSkillName(skill);
+
+                skillsContainer.appendChild(span);
+
+            });
 
 
-        const jobsContainer =
-            document.getElementById(
-                "jobs"
-            );
+            // JOB RECOMMENDATIONS
+            jobsList.innerHTML = "";
+
+            const jobs = data.recommendations || [];
+
+            if (!jobs.length) {
+
+                jobsList.textContent = "No jobs found.";
+
+            }
+
+            jobs.forEach(function (job) {
+
+                const card = document.createElement("div");
+                card.className = "job-card";
+
+                const matched = job.matched_skills || [];
+                const missing = job.missing_skills || [];
+                const learning = job.what_to_learn || [];
+
+                let matchedHTML = "";
+                let missingHTML = "";
+                let learningHTML = "";
+
+                matched.forEach(function (skill) {
+
+                    matchedHTML += `
+                        <span class="job-skill matched">
+                            ${escapeHTML(formatSkillName(skill))}
+                        </span>
+                    `;
+
+                });
+
+                missing.forEach(function (skill) {
+
+                    missingHTML += `
+                        <span class="job-skill missing">
+                            ${escapeHTML(formatSkillName(skill))}
+                        </span>
+                    `;
+
+                });
+
+                learning.forEach(function (item) {
+
+                    learningHTML += `
+                        <p>
+                            <strong>
+                                ${escapeHTML(formatSkillName(item.skill))}
+                            </strong>
+                            - ${escapeHTML(item.suggestion || "")}
+                        </p>
+                    `;
+
+                });
 
 
-        jobsContainer.innerHTML =
-            "";
+                card.innerHTML = `
+                    <div class="job-header">
+                        <div>
+                            <h3 class="job-title">
+                                ${escapeHTML(job.job_title)}
+                            </h3>
 
+                            <p class="company">
+                                ${escapeHTML(job.company)}
+                            </p>
+                        </div>
 
-        if (jobs.length === 0) {
+                        <div class="match-badge">
+                            ${Number(job.match_percentage) || 0}% Match
+                        </div>
+                    </div>
 
-            jobsContainer.innerHTML = `
-                <p class="empty">
-                    No matching jobs found.
-                </p>
-            `;
-
-        }
-
-
-        jobs.forEach(job => {
-
-
-            const div =
-                document.createElement(
-                    "div"
-                );
-
-
-            div.className =
-                "job";
-
-
-            const title =
-                job.job_title ||
-                job.title ||
-                "Job";
-
-
-            const company =
-                job.company ||
-                "Company not specified";
-
-
-            const location =
-                job.location ||
-                "Location not specified";
-
-
-            const experience =
-                job.experience ||
-                "Not specified";
-
-
-            const match =
-                job.match_percentage ??
-                job.match_score ??
-                job.match ??
-                0;
-
-
-            const requiredSkills =
-                Array.isArray(
-                    job.required_skills
-                )
-                    ? job.required_skills
-                    : [];
-
-
-            const matchedSkills =
-                Array.isArray(
-                    job.matched_skills
-                )
-                    ? job.matched_skills
-                    : [];
-
-
-            const missingSkills =
-                Array.isArray(
-                    job.missing_skills
-                )
-                    ? job.missing_skills
-                    : [];
-
-
-            let requiredHTML = "";
-
-
-            if (
-                requiredSkills.length
-            ) {
-
-                requiredHTML = `
+                    <div class="job-info">
+                        📍 ${escapeHTML(job.location || "Not specified")}
+                        &nbsp; | &nbsp;
+                        💼 ${escapeHTML(job.experience || "Not specified")}
+                    </div>
 
                     <div class="job-section">
-
-                        <strong>
-                            Required Skills
-                        </strong>
-
+                        <h4>Matched Skills</h4>
                         <div class="job-skills">
-
-                            ${requiredSkills
-                                .map(
-                                    skill => `
-                                        <span class="mini-skill">
-                                            ${escapeHTML(
-                                                formatText(skill)
-                                            )}
-                                        </span>
-                                    `
-                                )
-                                .join("")
-                            }
-
+                            ${matchedHTML || "No matched skills"}
                         </div>
-
                     </div>
-
-                `;
-
-            }
-
-
-            let matchedHTML = "";
-
-
-            if (
-                matchedSkills.length
-            ) {
-
-                matchedHTML = `
 
                     <div class="job-section">
-
-                        <strong>
-                            Matched Skills
-                        </strong>
-
+                        <h4>Missing Skills</h4>
                         <div class="job-skills">
-
-                            ${matchedSkills
-                                .map(
-                                    skill => `
-                                        <span
-                                            class="mini-skill mini-matched"
-                                        >
-                                            ${escapeHTML(
-                                                formatText(skill)
-                                            )}
-                                        </span>
-                                    `
-                                )
-                                .join("")
-                            }
-
+                            ${missingHTML || "No missing skills"}
                         </div>
-
                     </div>
-
-                `;
-
-            }
-
-
-            let missingHTML = "";
-
-
-            if (
-                missingSkills.length
-            ) {
-
-                missingHTML = `
-
-                    <div class="job-section">
-
-                        <strong>
-                            Missing Skills
-                        </strong>
-
-                        <div class="job-skills">
-
-                            ${missingSkills
-                                .map(
-                                    skill => `
-                                        <span class="missing-skill">
-                                            ${escapeHTML(
-                                                formatText(skill)
-                                            )}
-                                        </span>
-                                    `
-                                )
-                                .join("")
-                            }
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            }
-
-
-            /* =========================
-               APPLY BUTTON
-            ========================= */
-
-            const finalApplyUrl =
-                job.apply_url ||
-                companyApplyUrls[company] ||
-                "";
-
-
-            let applyHTML =
-                "";
-
-
-            if (finalApplyUrl) {
-
-                applyHTML = `
-
-                    <a
-                        class="apply"
-                        href="${escapeHTML(finalApplyUrl)}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Apply Now →
-                    </a>
-
-                `;
-
-            }
-
-
-            div.innerHTML = `
-
-                <div class="job-header">
-
-                    <div>
-
-                        <h3>
-                            ${escapeHTML(
-                                formatText(title)
-                            )}
-                        </h3>
-
-                        <div class="company">
-                            ${escapeHTML(company)}
-                        </div>
-
-                    </div>
-
-                    <div class="match">
-                        ${match}% Match
-                    </div>
-
-                </div>
-
-
-                <div class="job-info">
-
-                    <span>
-                        📍
-                        ${escapeHTML(location)}
-                    </span>
-
-                    <span>
-                        💼
-                        ${escapeHTML(experience)}
-                    </span>
-
-                </div>
-
-
-                ${requiredHTML}
-
-                ${matchedHTML}
-
-                ${missingHTML}
-
-                ${applyHTML}
-
-            `;
-
-
-            jobsContainer.appendChild(
-                div
-            );
-
-        });
-
-
-        /* ============================
-           ALL MISSING SKILLS
-        ============================ */
-
-        const allMissing =
-            collectMissingSkills(
-                jobs
-            );
-
-
-        const missingContainer =
-            document.getElementById(
-                "missingSkills"
-            );
-
-
-        missingContainer.innerHTML =
-            "";
-
-
-        const uniqueMissing =
-            [
-                ...new Set(
-                    allMissing.map(
-                        skill =>
-                            typeof skill === "string"
-                                ? skill
-                                : skill.skill
-                    )
-                )
-            ];
-
-
-        uniqueMissing.forEach(
-            skill => {
-
-                if (!skill) return;
-
-
-                const badge =
-                    document.createElement(
-                        "span"
-                    );
-
-
-                badge.className =
-                    "missing-skill";
-
-
-                badge.innerText =
-                    formatText(skill);
-
-
-                missingContainer.appendChild(
-                    badge
-                );
-
-            }
-        );
-
-
-        /* ============================
-           WHAT TO LEARN
-        ============================ */
-
-        const learnContainer =
-            document.getElementById(
-                "learnList"
-            );
-
-
-        learnContainer.innerHTML =
-            "";
-
-
-        const learningItems =
-            collectLearningItems(
-                jobs
-            );
-
-
-        if (
-            learningItems.length === 0
-        ) {
-
-            learnContainer.innerHTML = `
-
-                <div class="learning-item">
-
-                    <strong>
-                        Great!
-                    </strong>
-
-                    <span>
-                        Your current skills cover
-                        the required skills for
-                        the matched jobs.
-                    </span>
-
-                </div>
-
-            `;
-
-        }
-
-
-        learningItems.forEach(
-            item => {
-
-                const skill =
-                    item.skill ||
-                    item;
-
-
-                const suggestion =
-                    item.suggestion ||
-                    "";
-
-
-                const div =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                div.className =
-                    "learning-item";
-
-
-                div.innerHTML = `
-
-                    <strong>
-                        Learn
-                        ${escapeHTML(
-                            formatText(skill)
-                        )}
-                    </strong>
 
                     ${
-                        suggestion
-                            ? `
-                                <br>
-                                <span>
-                                    ${escapeHTML(
-                                        suggestion
-                                    )}
-                                </span>
-                            `
-                            : ""
+                        learningHTML
+                        ? `
+                            <div class="learn-box">
+                                <h4>What to Learn</h4>
+                                ${learningHTML}
+                            </div>
+                        `
+                        : ""
                     }
 
+                    ${
+                        job.apply_url
+                        ? `
+                            <a class="apply-btn"
+                               href="${escapeHTML(job.apply_url)}"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                               Apply for Job →
+                            </a>
+                        `
+                        : ""
+                    }
                 `;
 
+                jobsList.appendChild(card);
 
-                learnContainer.appendChild(
-                    div
-                );
-
-            }
-        );
-
-    }
+            });
 
 
+            // ALL MISSING SKILLS
+            missingSkillsContainer.innerHTML = "";
 
-    /* ============================
-       MISSING SKILLS
-    ============================ */
+            const allMissing = [];
 
-    function collectMissingSkills(
-        jobs
-    ) {
+            jobs.forEach(function (job) {
 
-        const missing =
-            [];
+                (job.missing_skills || []).forEach(function (skill) {
+                    allMissing.push(skill);
+                });
 
+            });
 
-        jobs.forEach(job => {
+            const uniqueMissing = [...new Set(allMissing)];
 
-            if (
-                Array.isArray(
-                    job.missing_skills
-                )
-            ) {
+            uniqueMissing.forEach(function (skill) {
 
-                missing.push(
-                    ...job.missing_skills
-                );
+                const span = document.createElement("span");
 
-            }
+                span.className = "job-skill missing";
+                span.textContent = formatSkillName(skill);
 
-        });
+                missingSkillsContainer.appendChild(span);
+
+            });
 
 
-        return missing;
+            // LEARNING SUGGESTIONS
+            learnList.innerHTML = "";
 
-    }
+            const learningMap = new Map();
 
+            jobs.forEach(function (job) {
 
+                (job.what_to_learn || []).forEach(function (item) {
 
-    /* ============================
-       LEARNING ITEMS
-    ============================ */
+                    if (item.skill) {
+                        learningMap.set(
+                            item.skill.toLowerCase(),
+                            item
+                        );
+                    }
 
-    function collectLearningItems(
-        jobs
-    ) {
+                });
 
-        const items =
-            [];
+            });
 
+            if (!learningMap.size) {
 
-        jobs.forEach(job => {
-
-            if (
-                Array.isArray(
-                    job.what_to_learn
-                )
-            ) {
-
-                items.push(
-                    ...job.what_to_learn
-                );
+                learnList.innerHTML = `
+                    <p>Great! No additional learning suggestions.</p>
+                `;
 
             }
 
-        });
+            learningMap.forEach(function (item) {
 
+                const div = document.createElement("div");
 
-        const unique =
-            new Map();
+                div.className = "learn-box";
 
+                div.innerHTML = `
+                    <p>
+                        <strong>
+                            ${escapeHTML(formatSkillName(item.skill))}
+                        </strong>
+                    </p>
+                    <p>
+                        ${escapeHTML(item.suggestion || "")}
+                    </p>
+                `;
 
-        items.forEach(item => {
+                learnList.appendChild(div);
 
-            const skill =
-                typeof item === "string"
-                    ? item
-                    : item.skill;
-
-
-            if (!skill) return;
-
-
-            const key =
-                skill.toLowerCase();
-
-
-            if (
-                !unique.has(key)
-            ) {
-
-                unique.set(
-                    key,
-                    item
-                );
-
-            }
-
-        });
-
-
-        return [
-            ...unique.values()
-        ];
-
-    }
-
-
-
-    /* ============================
-       FORMAT TEXT
-    ============================ */
-
-    function formatText(
-        text
-    ) {
-
-        if (!text) {
-
-            return "";
+            });
 
         }
 
 
-        return String(text)
+        // FORMAT SKILL NAMES
+        function formatSkillName(skill) {
 
-            .replaceAll(
-                "_",
-                " "
-            )
+            const names = {
 
-            .replace(
-                /\b\w/g,
-                char =>
-                    char.toUpperCase()
-            );
+                "python": "Python",
+                "c++": "C++",
+                "java": "Java",
+                "javascript": "JavaScript",
+                "html": "HTML",
+                "css": "CSS",
+                "react": "React",
 
-    }
+                "sql": "SQL",
+                "mysql": "MySQL",
 
+                "git": "Git",
+                "github": "GitHub",
 
+                "dsa": "DSA",
+                "algorithms": "Algorithms",
+                "data structures": "Data Structures",
 
-    /* ============================
-       ESCAPE HTML
-    ============================ */
+                "oops": "OOPS",
+                "oop": "OOP",
+                "dbms": "DBMS",
 
-    function escapeHTML(
-        value
-    ) {
+                "operating systems": "Operating Systems",
+                "computer networks": "Computer Networks",
 
-        return String(value)
-            .replace(
-                /&/g,
-                "&amp;"
-            )
-            .replace(
-                /</g,
-                "&lt;"
-            )
-            .replace(
-                />/g,
-                "&gt;"
-            )
-            .replace(
-                /"/g,
-                "&quot;"
-            )
-            .replace(
-                /'/g,
-                "&#039;"
-            );
+                "pandas": "Pandas",
+                "numpy": "NumPy",
+                "matplotlib": "Matplotlib",
 
-    }
+                "machine learning": "Machine Learning",
+                "scikit-learn": "Scikit-Learn",
+                "deep learning": "Deep Learning",
 
+                "artificial intelligence": "Artificial Intelligence",
+                "data science": "Data Science",
 
+                "excel": "Excel",
+                "power bi": "Power BI",
+                "tableau": "Tableau",
 
-    /* ============================
-       MESSAGE
-    ============================ */
+                "fastapi": "FastAPI",
+                "aws": "AWS",
+                "azure": "Azure",
+                "docker": "Docker"
 
-    function showMessage(
-        text,
-        type
-    ) {
+            };
 
-        const message =
-            document.getElementById(
-                "message"
-            );
+            const key = String(skill).toLowerCase().trim();
+
+            return names[key] || skill;
+
+        }
 
 
-        message.innerText =
-            text;
+        // HTML SECURITY HELPER
+        function escapeHTML(value) {
+
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+        }
 
 
-        message.className =
-            "message " +
-            type;
+        // SHOW MESSAGE
+        function showMessage(text, type) {
+
+            message.textContent = text;
+            message.className = "message " + type;
+            message.style.display = "block";
+
+        }
 
 
-        message.style.display =
-            "block";
+        // HIDE MESSAGE
+        function hideMessage() {
 
-    }
+            message.textContent = "";
+            message.className = "message";
+            message.style.display = "none";
 
+        }
 
-</script>
-
+    </script>
 
 </body>
-
 </html>

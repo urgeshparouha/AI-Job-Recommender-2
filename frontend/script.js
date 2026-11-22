@@ -1,4 +1,5 @@
-const API_URL = "https://ai-job-recommender-live-production.up.railway.app";
+
+const API_URL = "http://127.0.0.1:8000";
 
 const resumeFile = document.getElementById("resumeFile");
 const selectedFile = document.getElementById("selectedFile");
@@ -47,6 +48,8 @@ analyzeBtn.addEventListener("click", async function () {
     errorMessage.classList.add("hidden");
     loading.classList.add("hidden");
 
+    results.classList.add("hidden");
+
     if (resumeFile.files.length === 0) {
 
         errorMessage.textContent =
@@ -82,8 +85,10 @@ analyzeBtn.addEventListener("click", async function () {
 
         if (!response.ok) {
 
+            const errorText = await response.text();
+
             throw new Error(
-                "Server returned error: " + response.status
+                `Server Error ${response.status}: ${errorText}`
             );
 
         }
@@ -102,10 +107,10 @@ analyzeBtn.addEventListener("click", async function () {
 
     } catch (error) {
 
-        console.error(error);
+        console.error("Backend Error:", error);
 
         errorMessage.textContent =
-            "Backend se connection nahi ho pa raha. Make sure FastAPI server is running.";
+            "Backend connection failed: " + error.message;
 
         errorMessage.classList.remove("hidden");
 
@@ -180,9 +185,7 @@ function displayResults(data) {
             "job-card";
 
 
-        // =============================
         // MATCHED SKILLS
-        // =============================
 
         let matchedSkillsHTML = "";
 
@@ -197,9 +200,7 @@ function displayResults(data) {
         });
 
 
-        // =============================
         // MISSING SKILLS
-        // =============================
 
         let missingSkillsHTML = "";
 
@@ -214,9 +215,7 @@ function displayResults(data) {
         });
 
 
-        // =============================
         // LEARNING SUGGESTIONS
-        // =============================
 
         let learningHTML = "";
 
@@ -225,18 +224,14 @@ function displayResults(data) {
             learningHTML = `
                 <div class="learn-box">
 
-                    <h4>
-                        What to Learn
-                    </h4>
+                    <h4>What to Learn</h4>
 
                     ${job.what_to_learn.map(function (item) {
 
                         return `
                             <p>
                                 <strong>
-                                    ${escapeHTML(
-                                        formatSkillName(item.skill)
-                                    )}
+                                    ${escapeHTML(formatSkillName(item.skill))}
                                 </strong>
                                 — ${escapeHTML(item.suggestion)}
                             </p>
@@ -250,9 +245,7 @@ function displayResults(data) {
         }
 
 
-        // =============================
-        // JOB CARD HTML
-        // =============================
+        // JOB CARD
 
         jobCard.innerHTML = `
 
@@ -285,9 +278,7 @@ function displayResults(data) {
 
             <div class="job-section">
 
-                <h4>
-                    Matched Skills
-                </h4>
+                <h4>Matched Skills</h4>
 
                 <div class="job-skills">
 
@@ -303,9 +294,7 @@ function displayResults(data) {
 
             <div class="job-section">
 
-                <h4>
-                    Missing Skills
-                </h4>
+                <h4>Missing Skills</h4>
 
                 <div class="job-skills">
 
@@ -323,7 +312,7 @@ function displayResults(data) {
 
 
             <a
-                href="${escapeHTML(job.apply_url)}"
+                href="${escapeHTML(job.apply_url || '#')}"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="apply-btn"
@@ -338,7 +327,7 @@ function displayResults(data) {
     });
 
 
-    // Scroll to results
+    // SCROLL TO RESULTS
 
     results.scrollIntoView({
         behavior: "smooth"
@@ -414,7 +403,7 @@ function formatSkillName(skill) {
 
 function escapeHTML(value) {
 
-    return String(value)
+    return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")

@@ -1,29 +1,21 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pypdf import PdfReader
-from docx import Document
-import io
+
 import os
+import re
+from pathlib import Path
+
 import mysql.connector
 from dotenv import load_dotenv
+from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 
-load_dotenv()
+# =====================================
+# ENVIRONMENT
+# =====================================
 
+ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(dotenv_path=ENV_PATH, override=True)
 
-# =========================================================
-# FASTAPI APP
-# =========================================================
-
-app = FastAPI(
-    title="AI Job Recommender API",
-    description="AI-powered resume analysis and job recommendation system",
-    version="3.0.0"
-)
-
-
-# =========================================================
-# CORS
-# =========================================================
+app = FastAPI(title="AI Job Recommender")
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,63 +26,193 @@ app.add_middleware(
 )
 
 
-# =========================================================
-# MYSQL DATABASE CONNECTION
-# =========================================================
+# =====================================
+# DATABASE CONNECTION
+# =====================================
 
 def get_db_connection():
-
     return mysql.connector.connect(
         host=os.getenv("DB_HOST", "localhost"),
+        port=int(os.getenv("DB_PORT", "3306")),
         user=os.getenv("DB_USER", "root"),
-        password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME", "ai_job_recommender")
+        password=os.getenv("DB_PASSWORD", ""),
+        database=os.getenv("DB_NAME", "ai_job_recommender"),
     )
 
 
-# =========================================================
-# BASIC ROUTES
-# =========================================================
+# =====================================
+# SKILLS DATABASE
+# =====================================
 
-@app.get("/")
-def home():
+SKILLS = [
+    "python", "java", "c++", "javascript",
+    "html", "css", "react", "sql", "mysql",
+    "git", "github", "dsa", "algorithms",
+    "data structures", "oops", "oop", "dbms",
+    "operating systems", "computer networks",
+    "pandas", "numpy", "matplotlib",
+    "machine learning", "scikit-learn",
+    "deep learning", "artificial intelligence",
+    "data science", "excel", "power bi",
+    "tableau", "fastapi", "flask",
+    "aws", "azure", "docker"
+]
 
-    return {
-        "message": "AI Job Recommender Backend is Running!"
-    }
+
+LEARNING_SUGGESTIONS = {
+    "python": "Practice Python basics, functions, OOP and problem solving.",
+    "sql": "Practice SELECT, JOIN, GROUP BY and subqueries.",
+    "mysql": "Learn database design, queries and joins.",
+    "dsa": "Practice arrays, strings, searching and sorting.",
+    "machine learning": "Learn supervised and unsupervised learning.",
+    "pandas": "Practice data cleaning and data analysis.",
+    "numpy": "Learn arrays, indexing and numerical operations.",
+    "excel": "Learn formulas, pivot tables and data analysis.",
+    "git": "Practice Git commands and version control.",
+    "fastapi": "Build REST APIs using FastAPI.",
+    "html": "Learn semantic HTML and page structure.",
+    "css": "Practice layouts, flexbox and responsive design.",
+    "javascript": "Learn DOM, functions and asynchronous JavaScript.",
+    "react": "Learn components, props and state.",
+    "java": "Practice OOP and Java programming.",
+    "oop": "Learn classes, objects, inheritance and polymorphism.",
+    "oops": "Learn classes, objects, inheritance and polymorphism.",
+    "data science": "Practice data analysis and machine learning projects.",
+    "artificial intelligence": "Study AI concepts and practical projects.",
+    "scikit-learn": "Build ML models using Scikit-Learn.",
+    "deep learning": "Learn neural networks and deep learning basics.",
+    "power bi": "Practice dashboards and data visualization.",
+    "docker": "Learn containers and basic Docker commands.",
+    "aws": "Learn cloud fundamentals and AWS services.",
+    "azure": "Learn cloud computing using Azure.",
+    "flask": "Build web applications using Flask.",
+    "dbms": "Learn SQL, normalization and DBMS concepts.",
+    "algorithms": "Practice searching, sorting and algorithm analysis.",
+    "data structures": "Learn arrays, stacks, queues, trees and graphs.",
+    "computer networks": "Study TCP/IP, HTTP, DNS and networking basics.",
+    "operating systems": "Study processes, threads, memory and scheduling.",
+    "c++": "Practice C++ programming and STL.",
+    "matplotlib": "Create charts and data visualizations.",
+    "tableau": "Practice interactive dashboards in Tableau.",
+    "github": "Practice repositories, commits and collaboration."
+}
 
 
-@app.get("/health")
-def health():
+# =====================================
+# RESUME TEXT EXTRACTION
+# =====================================
 
-    return {
-        "status": "healthy"
-    }
+def extract_resume_text(filename, content):
+
+    extension = Path(filename or "").suffix.lower()
+
+    # TXT
+    if extension == ".txt":
+        return content.decode("utf-8", errors="ignore")
+
+    # PDF
+    if extension == ".pdf":
+        try:
+            from pypdf import PdfReader
+            import io
+
+            reader = PdfReader(io.BytesIO(content))
+
+            return " ".join(
+                page.extract_text() or ""
+                for page in reader.pages
+            )
+
+        except Exception as e:
+            raise ValueError(
+                "PDF reading failed. Check pypdf installation."
+            ) from e
+
+    # DOCX
+    if extension == ".docx":
+        try:
+            from docx import Document
+            import io
+
+            document = Document(io.BytesIO(content))
+
+            return " ".join(
+                paragraph.text
+                for paragraph in document.paragraphs
+            )
+
+        except Exception as e:
+            raise ValueError(
+                "DOCX reading failed. Check python-docx installation."
+            ) from e
+
+    raise ValueError(
+        "Unsupported file. Upload PDF, DOCX or TXT."
+    )
 
 
-# =========================================================
+# =====================================
+# SKILLS DETECTION
+# =====================================
+
+def detect_skills(resume_text):
+
+    text = resume_text.lower()
+    detected = []
+
+    for skill in SKILLS:
+
+        pattern = (
+            r"(?<![a-z0-9+#])"
+            + re.escape(skill.lower())
+            + r"(?![a-z0-9+#])"
+        )
+
+        if re.search(pattern, text):
+            detected.append(skill)
+
+    return detected
+
+
+# =====================================
+# RESUME SCORE
+# =====================================
+
+def calculate_resume_score(skills):
+
+    total_skills = len(SKILLS)
+
+    if total_skills == 0:
+        return 0
+
+    score = round(
+        (len(skills) / total_skills) * 100
+    )
+
+    return min(score, 100)
+
+
+# =====================================
 # DATABASE TEST
-# =========================================================
+# =====================================
 
 @app.get("/db-test")
 def db_test():
 
     try:
-
-        db = get_db_connection()
-
-        cursor = db.cursor()
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
         cursor.execute("SELECT DATABASE()")
-
-        result = cursor.fetchone()
+        db_name = cursor.fetchone()[0]
 
         cursor.close()
-        db.close()
+        conn.close()
 
         return {
             "success": True,
-            "database": result[0]
+            "message": "Database connected successfully",
+            "database": db_name
         }
 
     except Exception as e:
@@ -101,778 +223,189 @@ def db_test():
         }
 
 
-# =========================================================
-# SKILLS LIST
-# =========================================================
-
-SKILLS = [
-
-    "python",
-    "java",
-    "c++",
-    "javascript",
-    "html",
-    "css",
-    "react",
-    "node.js",
-    "fastapi",
-    "django",
-    "flask",
-
-    "sql",
-    "mysql",
-    "postgresql",
-    "mongodb",
-
-    "git",
-    "github",
-
-    "dsa",
-    "algorithms",
-    "data structures",
-    "oops",
-    "oop",
-    "dbms",
-    "operating systems",
-    "computer networks",
-
-    "pandas",
-    "numpy",
-    "matplotlib",
-    "scikit-learn",
-
-    "machine learning",
-    "deep learning",
-    "artificial intelligence",
-    "data science",
-
-    "excel",
-    "power bi",
-    "tableau",
-
-    "aws",
-    "azure",
-    "docker"
-
-]
-
-
-# =========================================================
-# SKILL DETECTION
-# =========================================================
-
-def detect_skills(text):
-
-    text = text.lower()
-
-    detected = []
-
-    for skill in SKILLS:
-
-        if skill.lower() in text:
-
-            detected.append(skill)
-
-    return detected
-
-
-# =========================================================
-# REALISTIC RESUME SCORE
-# =========================================================
-#
-# TOTAL = 100
-#
-# Skills                 = 35
-# Projects               = 20
-# Education              = 15
-# Experience/Internship  = 15
-# Resume Completeness    = 15
-#
-# =========================================================
-
-def calculate_resume_score(text, detected_skills):
-
-    text = text.lower()
-
-
-    # =====================================================
-    # 1. SKILLS SCORE - 35 MARKS
-    # =====================================================
-
-    skill_score = min(
-        len(detected_skills) * 2.5,
-        35
-    )
-
-
-    # =====================================================
-    # 2. PROJECTS SCORE - 20 MARKS
-    # =====================================================
-
-    project_keywords = [
-
-        "project",
-        "projects",
-        "github",
-        "developed",
-        "built",
-        "implemented",
-        "application",
-        "system"
-
-    ]
-
-    project_hits = sum(
-
-        1
-        for keyword in project_keywords
-        if keyword in text
-
-    )
-
-    project_score = min(
-        project_hits * 2.5,
-        20
-    )
-
-
-    # =====================================================
-    # 3. EDUCATION SCORE - 15 MARKS
-    # =====================================================
-
-    education_keywords = [
-
-        "btech",
-        "b.tech",
-        "bachelor",
-        "computer science",
-        "engineering",
-        "university",
-        "college",
-        "degree"
-
-    ]
-
-    education_hits = sum(
-
-        1
-        for keyword in education_keywords
-        if keyword in text
-
-    )
-
-    education_score = min(
-        education_hits * 2,
-        15
-    )
-
-
-    # =====================================================
-    # 4. EXPERIENCE / INTERNSHIP - 15 MARKS
-    # =====================================================
-
-    experience_keywords = [
-
-        "internship",
-        "intern",
-        "experience",
-        "work experience",
-        "employment",
-        "developer",
-        "engineer"
-
-    ]
-
-    experience_hits = sum(
-
-        1
-        for keyword in experience_keywords
-        if keyword in text
-
-    )
-
-    experience_score = min(
-        experience_hits * 2.5,
-        15
-    )
-
-
-    # =====================================================
-    # 5. RESUME COMPLETENESS - 15 MARKS
-    # =====================================================
-
-    completeness_sections = [
-
-        "education",
-        "skills",
-        "projects",
-        "contact",
-        "email",
-        "phone",
-        "resume",
-        "objective",
-        "summary",
-        "certification",
-        "certifications"
-
-    ]
-
-    completeness_hits = sum(
-
-        1
-        for section in completeness_sections
-        if section in text
-
-    )
-
-    completeness_score = min(
-        completeness_hits * 1.5,
-        15
-    )
-
-
-    # =====================================================
-    # FINAL SCORE
-    # =====================================================
-
-    score = (
-
-        skill_score
-        + project_score
-        + education_score
-        + experience_score
-        + completeness_score
-
-    )
-
-    return round(
-        min(score, 100)
-    )
-
-
-# =========================================================
-# RESUME TEXT EXTRACTION
-# =========================================================
-
-def extract_resume_text(file_bytes, filename):
-
-    filename = filename.lower()
-
-
-    # =====================================================
-    # PDF
-    # =====================================================
-
-    if filename.endswith(".pdf"):
-
-        reader = PdfReader(
-            io.BytesIO(file_bytes)
-        )
-
-        text = ""
-
-        for page in reader.pages:
-
-            page_text = page.extract_text()
-
-            if page_text:
-
-                text += page_text + "\n"
-
-        return text
-
-
-    # =====================================================
-    # DOCX
-    # =====================================================
-
-    elif filename.endswith(".docx"):
-
-        document = Document(
-            io.BytesIO(file_bytes)
-        )
-
-        text = ""
-
-        for paragraph in document.paragraphs:
-
-            text += paragraph.text + "\n"
-
-        return text
-
-
-    # =====================================================
-    # INVALID FILE
-    # =====================================================
-
-    else:
-
-        raise HTTPException(
-            status_code=400,
-            detail="Only PDF and DOCX files are supported."
-        )
-
-
-# =========================================================
-# UPLOAD RESUME
-# =========================================================
-
-@app.post("/upload-resume")
-async def upload_resume(
-    file: UploadFile = File(...)
-):
-
-    try:
-
-        file_bytes = await file.read()
-
-
-        text = extract_resume_text(
-            file_bytes,
-            file.filename
-        )
-
-
-        detected_skills = detect_skills(
-            text
-        )
-
-
-        resume_score = calculate_resume_score(
-            text,
-            detected_skills
-        )
-
-
-        return {
-
-            "filename": file.filename,
-
-            "detected_skills": detected_skills,
-
-            "skill_count": len(
-                detected_skills
-            ),
-
-            "resume_score": resume_score,
-
-            "message": "Resume analyzed successfully"
-
-        }
-
-
-    except HTTPException:
-
-        raise
-
-
-    except Exception as e:
-
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
-
-
-# =========================================================
-# GET JOBS FROM MYSQL
-# =========================================================
-
-def get_jobs_from_database():
-
-    db = get_db_connection()
-
-    cursor = db.cursor(
-        dictionary=True
-    )
-
-
-    cursor.execute("""
-        SELECT
-            id,
-            job_title,
-            company,
-            location,
-            experience,
-            required_skills,
-            apply_url
-        FROM jobs
-    """)
-
-
-    jobs = cursor.fetchall()
-
-
-    cursor.close()
-
-    db.close()
-
-
-    return jobs
-
-
-# =========================================================
-# GET ALL JOBS
-# =========================================================
+# =====================================
+# GET JOBS
+# =====================================
 
 @app.get("/jobs")
 def get_jobs():
 
     try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
-        jobs = get_jobs_from_database()
+        cursor.execute("SELECT * FROM jobs")
+        jobs = cursor.fetchall()
 
+        cursor.close()
+        conn.close()
 
         return {
-
             "success": True,
-
             "count": len(jobs),
-
             "jobs": jobs
-
         }
-
 
     except Exception as e:
 
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
+        return {
+            "success": False,
+            "error": str(e)
+        }
 
 
-# =========================================================
-# LEARNING MAP
-# =========================================================
+# =====================================
+# UPLOAD RESUME
+# =====================================
 
-LEARNING_MAP = {
+@app.post("/upload-resume")
+async def upload_resume(file: UploadFile = File(...)):
 
-    "python":
-        "Learn Python fundamentals, functions, OOP and problem solving.",
+    try:
+        content = await file.read()
 
-    "sql":
-        "Learn SQL queries, joins, subqueries, group by and database concepts.",
+        return {
+            "success": True,
+            "filename": file.filename,
+            "message": "Resume uploaded successfully",
+            "size": len(content)
+        }
 
-    "dsa":
-        "Learn arrays, strings, linked lists, stacks, queues, trees and graphs.",
+    except Exception as e:
 
-    "oops":
-        "Learn classes, objects, inheritance, polymorphism and abstraction.",
-
-    "oop":
-        "Learn classes, objects, inheritance, polymorphism and abstraction.",
-
-    "dbms":
-        "Learn normalization, keys, transactions, indexing and SQL.",
-
-    "git":
-        "Learn Git commands, GitHub repositories, branching and version control.",
-
-    "fastapi":
-        "Learn FastAPI routes, APIs, request handling and database integration.",
-
-    "mysql":
-        "Learn MySQL databases, tables, queries, joins and relationships.",
-
-    "pandas":
-        "Learn DataFrame operations, filtering, grouping and data cleaning.",
-
-    "numpy":
-        "Learn arrays, mathematical operations and numerical computing.",
-
-    "machine learning":
-        "Learn regression, classification, clustering and model evaluation.",
-
-    "data science":
-        "Learn Python, statistics, SQL, pandas, visualization and machine learning.",
-
-    "javascript":
-        "Learn JavaScript fundamentals, DOM, events and modern ES6.",
-
-    "html":
-        "Learn HTML structure, forms, semantic tags and accessibility.",
-
-    "css":
-        "Learn CSS layouts, Flexbox, Grid, responsive design and animations.",
-
-    "react":
-        "Learn React components, props, state, hooks and API integration."
-
-}
+        return {
+            "success": False,
+            "error": str(e)
+        }
 
 
-# =========================================================
-# LEARNING SUGGESTIONS
-# =========================================================
-
-def get_learning_suggestions(
-    missing_skills
-):
-
-    suggestions = []
-
-
-    for skill in missing_skills:
-
-        skill_lower = skill.lower()
-
-
-        if skill_lower in LEARNING_MAP:
-
-            suggestions.append({
-
-                "skill": skill,
-
-                "suggestion":
-                    LEARNING_MAP[skill_lower]
-
-            })
-
-
-        else:
-
-            suggestions.append({
-
-                "skill": skill,
-
-                "suggestion":
-                    f"Learn {skill} and practice it through projects."
-
-            })
-
-
-    return suggestions
-
-
-# =========================================================
-# JOB MATCHING
-# =========================================================
+# =====================================
+# MATCH JOBS
+# =====================================
 
 @app.post("/match-jobs")
-async def match_jobs(
-    file: UploadFile = File(...)
-):
+async def match_jobs(file: UploadFile = File(...)):
+
+    conn = None
+    cursor = None
 
     try:
 
-        # =================================================
-        # READ RESUME
-        # =================================================
+        content = await file.read()
 
-        file_bytes = await file.read()
+        resume_text = extract_resume_text(
+            file.filename,
+            content
+        ).lower()
 
-
-        text = extract_resume_text(
-            file_bytes,
-            file.filename
-        )
-
-
-        # =================================================
-        # DETECT SKILLS
-        # =================================================
-
-        detected_skills = detect_skills(
-            text
-        )
-
-
-        # =================================================
-        # CALCULATE REALISTIC RESUME SCORE
-        # =================================================
+        detected_skills = detect_skills(resume_text)
 
         resume_score = calculate_resume_score(
-            text,
             detected_skills
         )
 
+        # Connect database
+        conn = get_db_connection()
 
-        # =================================================
-        # GET JOBS
-        # =================================================
+        cursor = conn.cursor(dictionary=True)
 
-        jobs = get_jobs_from_database()
+        cursor.execute("SELECT * FROM jobs")
 
+        jobs = cursor.fetchall()
 
-        matched_jobs = []
+        recommendations = []
 
-
-        # =================================================
-        # MATCH EVERY JOB
-        # =================================================
-
+        # Match each job
         for job in jobs:
 
+            job_title = str(
+                job.get("job_title", "")
+            )
 
-            # ---------------------------------------------
-            # REQUIRED SKILLS
-            # ---------------------------------------------
+            company = str(
+                job.get("company", "")
+            )
+
+            required_skills_text = str(
+                job.get("required_skills", "")
+            ).lower()
 
             required_skills = [
-
-                skill.strip().lower()
-
-                for skill in
-                job["required_skills"].split(",")
-
+                skill.strip()
+                for skill in required_skills_text.split(",")
+                if skill.strip()
             ]
 
-
-            # ---------------------------------------------
-            # USER SKILLS
-            # ---------------------------------------------
-
-            user_skills = [
-
-                skill.lower()
-
-                for skill in detected_skills
-
+            matched_skills = [
+                skill
+                for skill in required_skills
+                if skill.lower() in detected_skills
             ]
 
+            missing_skills = [
+                skill
+                for skill in required_skills
+                if skill.lower() not in detected_skills
+            ]
 
-            matched_skills = []
+            total_required = len(required_skills)
 
-            missing_skills = []
-
-
-            # ---------------------------------------------
-            # COMPARE SKILLS
-            # ---------------------------------------------
-
-            for skill in required_skills:
-
-                if skill in user_skills:
-
-                    matched_skills.append(
-                        skill
-                    )
-
-                else:
-
-                    missing_skills.append(
-                        skill
-                    )
-
-
-            # ---------------------------------------------
-            # MATCH PERCENTAGE
-            # ---------------------------------------------
-
-            if len(required_skills) > 0:
+            if total_required > 0:
 
                 match_percentage = round(
-
-                    (
-                        len(matched_skills)
-                        /
-                        len(required_skills)
-                    )
-                    * 100
-
+                    (len(matched_skills) / total_required) * 100
                 )
 
             else:
 
                 match_percentage = 0
 
+            what_to_learn = []
 
-            # ---------------------------------------------
-            # ADD JOB
-            # ---------------------------------------------
+            for skill in missing_skills:
 
-            matched_jobs.append({
+                suggestion = LEARNING_SUGGESTIONS.get(
+                    skill.lower(),
+                    f"Practice {skill} and build a small project."
+                )
 
-                "job_id":
-                    job["id"],
+                what_to_learn.append({
+                    "skill": skill,
+                    "suggestion": suggestion
+                })
 
-                "job_title":
-                    job["job_title"],
+            job["matched_skills"] = matched_skills
+            job["missing_skills"] = missing_skills
+            job["match_percentage"] = match_percentage
+            job["what_to_learn"] = what_to_learn
 
-                "company":
-                    job["company"],
+            recommendations.append(job)
 
-                "location":
-                    job["location"],
-
-                "experience":
-                    job["experience"],
-
-                "required_skills":
-                    required_skills,
-
-                "matched_skills":
-                    matched_skills,
-
-                "missing_skills":
-                    missing_skills,
-
-                "match_percentage":
-                    match_percentage,
-
-                "apply_url":
-                    job["apply_url"],
-
-                "what_to_learn":
-                    get_learning_suggestions(
-                        missing_skills
-                    )
-
-            })
-
-
-        # =================================================
-        # SORT BY MATCH
-        # =================================================
-
-        matched_jobs.sort(
-
-            key=lambda x:
-                x["match_percentage"],
-
+        # Sort by match percentage
+        recommendations.sort(
+            key=lambda job: job["match_percentage"],
             reverse=True
-
         )
 
-
-        # =================================================
-        # FINAL RESPONSE
-        # =================================================
-
         return {
-
             "success": True,
-
-            "filename":
-                file.filename,
-
-            "resume_score":
-                resume_score,
-
-            "detected_skills":
-                detected_skills,
-
-            "total_jobs_checked":
-                len(jobs),
-
-            "recommendations":
-                matched_jobs
-
+            "resume_score": resume_score,
+            "detected_skills": detected_skills,
+            "total_jobs_checked": len(jobs),
+            "recommendations": recommendations
         }
-
-
-    except HTTPException:
-
-        raise
-
 
     except Exception as e:
 
-        raise HTTPException(
+        return {
+            "success": False,
+            "error": str(e)
+        }
 
-            status_code=500,
+    finally:
 
-            detail=str(e)
+        if cursor is not None:
+            cursor.close()
 
-        )
+        if conn is not None:
+            conn.close()
